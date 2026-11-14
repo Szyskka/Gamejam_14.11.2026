@@ -41,7 +41,7 @@ public class projectile_script : MonoBehaviour
                 SetProjectile();
                 break;
             case "Shield":
-                col.excludeLayers = 0;
+                col.excludeLayers = LayerMask.GetMask("Projectile");
                 collidedWithShield = true;
                 break;
         }
@@ -56,7 +56,7 @@ public class projectile_script : MonoBehaviour
     }
     void SetProjectile()
     {
-        col.excludeLayers = LayerMask.GetMask("Enemy");
+        col.excludeLayers = LayerMask.GetMask("Enemy", "Projectile");
         collidedWithShield = false;
         gameObject.SetActive(false);
         parentObj.GetComponent<enemy_script>().projectilesFired[gameObject] = false;

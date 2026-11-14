@@ -139,6 +139,8 @@ MonoBehaviour:
   projectileRange: 23
   projectilePrefab: {fileID: 4623152478958475872, guid: bbe73dc4fce85434680f1939d9a96f4f, type: 3}
   health: 1
+  moveSpeed: 5
+  stopDistance: 20
 --- !u!61 &6958669809331660081
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -155,7 +157,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

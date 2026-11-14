@@ -11,15 +11,20 @@ public class enemy_script : MonoBehaviour
     public GameObject projectilePrefab;
     [Header("Health")]
     public int health;
+    [Header("Move")]
+    public float moveSpeed;
+    public float stopDistance;
     private List<GameObject> projectiles = new List<GameObject>();
     public Dictionary<GameObject, bool> projectilesFired = new Dictionary<GameObject, bool>();
     private float nextFireTime;
     private GameObject player;
+    private Rigidbody2D rb;
 
 
     void Start()
     {
         player = GameObject.Find("Player");
+        rb = GetComponent<Rigidbody2D>();
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -29,6 +34,7 @@ public class enemy_script : MonoBehaviour
             Shoot();
             nextFireTime = Time.time + cooldown;
         }
+        Move();
     }
     void Shoot()
     {
@@ -80,6 +86,15 @@ public class enemy_script : MonoBehaviour
 
     void Move()
     {
-        
+        Vector2 direction = player.GetComponent<Rigidbody2D>().position - rb.position;
+        float distance = direction.magnitude;
+        if (distance <= stopDistance)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+        else
+        {
+            rb.linearVelocity = direction.normalized * moveSpeed;
+        }
     }
 }
