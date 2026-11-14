@@ -7,18 +7,24 @@ public class enemy_script : MonoBehaviour
     public float cooldown;
     public float projectileLife;
     public float projectileForce;
+    public float projectileRange;
     public GameObject projectilePrefab;
     [Header("Health")]
     public int health;
     private List<GameObject> projectiles = new List<GameObject>();
     public Dictionary<GameObject, bool> projectilesFired = new Dictionary<GameObject, bool>();
     private float nextFireTime;
+    private GameObject player;
 
 
+    void Start()
+    {
+        player = GameObject.Find("Player");
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Time.time >= nextFireTime)
+        if (Time.time >= nextFireTime && Vector2.Distance(transform.position, player.GetComponent<Rigidbody2D>().position) <= projectileRange)
         {
             Shoot();
             nextFireTime = Time.time + cooldown;
@@ -70,5 +76,10 @@ public class enemy_script : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    void Move()
+    {
+        
     }
 }
