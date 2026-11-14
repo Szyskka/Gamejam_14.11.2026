@@ -60,6 +60,6 @@ public class projectile_script : MonoBehaviour
         collidedWithShield = false;
         gameObject.SetActive(false);
         parentObj.GetComponent<enemy_script>().projectilesFired[gameObject] = false;
-        gameObject.transform.position = parentObj.transform.position;
+        gameObject.transform.position = parentObj.transform.Find("TurretPivot/Turret/ProjectilePivot").position;
     }
 }

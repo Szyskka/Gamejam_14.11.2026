@@ -13,7 +13,10 @@ public class enemy_script : MonoBehaviour
     public int health;
     [Header("Move")]
     public float moveSpeed;
+    public float turnSpeed;
     public float stopDistance;
+    [Header("Animation")]
+    public Animator animator;
     private List<GameObject> projectiles = new List<GameObject>();
     public Dictionary<GameObject, bool> projectilesFired = new Dictionary<GameObject, bool>();
     private float nextFireTime;
@@ -56,7 +59,7 @@ public class enemy_script : MonoBehaviour
         }
         if (createP == true)
         {
-            GameObject p = Instantiate(projectilePrefab, gameObject.transform);
+            GameObject p = Instantiate(projectilePrefab,transform.Find("TurretPivot/Turret/ProjectilePivot").position,Quaternion.identity, gameObject.transform);
             projectiles.Add(p);
             projectilesFired.Add(p, true);
             p.GetComponent<projectile_script>().Shoot(projectileForce, projectileLife);
@@ -95,6 +98,15 @@ public class enemy_script : MonoBehaviour
         else
         {
             rb.linearVelocity = direction.normalized * moveSpeed;
+        }
+        if (rb.linearVelocity.x>0 || rb.linearVelocityY>0)
+        {
+            animator.SetBool("driving", true);
+            transform.up = rb.linearVelocity;
+        }
+        else
+        {
+            animator.SetBool("driving", false);
         }
     }
 }

@@ -33,7 +33,7 @@ public class UI_manager_script : MonoBehaviour
     }
     public void QuitGame () 
     {
-        Application.Quit ();
+        Application.Quit();
         Debug.Log("a");
     }
     public void CloseUI()
