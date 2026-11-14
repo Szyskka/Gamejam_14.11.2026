@@ -6,7 +6,7 @@ public class projectile_script : MonoBehaviour
     private Rigidbody2D rb;
     private float projectileDie;
     private bool shoot;
-    private GameObject parentObj;
+    public GameObject parentObj;
     private Collider2D col;
     private bool collidedWithShield = false;
     void Awake()
@@ -14,7 +14,10 @@ public class projectile_script : MonoBehaviour
         col = GetComponent<CircleCollider2D>();
         playerRB = GameObject.Find("Player").GetComponent<Rigidbody2D>();
         rb = GetComponent<Rigidbody2D>();
-        parentObj = transform.parent.gameObject;
+    }
+    public void Initialize(GameObject creator)
+    {
+        parentObj = creator;
     }
 
     void FixedUpdate()
@@ -22,6 +25,10 @@ public class projectile_script : MonoBehaviour
         if (Time.time >= projectileDie && shoot == true)
         {
             SetProjectile();
+        }
+        if (parentObj == null)
+        {
+            Destroy(gameObject);
         }
     }
 

@@ -59,9 +59,10 @@ public class enemy_script : MonoBehaviour
         }
         if (createP == true)
         {
-            GameObject p = Instantiate(projectilePrefab,transform.Find("TurretPivot/Turret/ProjectilePivot").position,Quaternion.identity, gameObject.transform);
+            GameObject p = Instantiate(projectilePrefab,transform.Find("TurretPivot/Turret/ProjectilePivot").position,Quaternion.identity);
             projectiles.Add(p);
             projectilesFired.Add(p, true);
+            p.GetComponent<projectile_script>().parentObj = gameObject;
             p.GetComponent<projectile_script>().Shoot(projectileForce, projectileLife);
         }
         else
@@ -99,14 +100,27 @@ public class enemy_script : MonoBehaviour
         {
             rb.linearVelocity = direction.normalized * moveSpeed;
         }
-        if (rb.linearVelocity.x>0 || rb.linearVelocityY>0)
+        if (rb.linearVelocity.x!=0 || rb.linearVelocityY!=0)
         {
             animator.SetBool("driving", true);
-            transform.up = rb.linearVelocity;
         }
         else
         {
             animator.SetBool("driving", false);
+        }
+    }
+    void Update()
+    {
+        Vector2 moveDirection = rb.linearVelocity;
+
+        // Only rotate when the object is actually moving
+        if (moveDirection.sqrMagnitude > 0.01f)
+        {
+            float targetAngle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg - 90;
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
+
+            // Smoothly rotate toward the target direction
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 720f * Time.deltaTime);
         }
     }
 }
