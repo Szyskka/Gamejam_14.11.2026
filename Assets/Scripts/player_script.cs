@@ -25,6 +25,7 @@ public class player_script : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.MovePosition(rb.position+directions*moveSpeed*Time.fixedDeltaTime);
+        Vector2 moveDir = directions.normalized;
+        rb.linearVelocity = moveDir * moveSpeed;
     }
 }

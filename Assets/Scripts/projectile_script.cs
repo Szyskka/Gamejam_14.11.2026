@@ -7,9 +7,11 @@ public class projectile_script : MonoBehaviour
     private float projectileDie;
     private bool shoot;
     private GameObject parentObj;
+    private Collider2D col;
     private bool collidedWithShield = false;
     void Awake()
     {
+        col = GetComponent<CircleCollider2D>();
         playerRB = GameObject.Find("Player").GetComponent<Rigidbody2D>();
         rb = GetComponent<Rigidbody2D>();
         parentObj = transform.parent.gameObject;
@@ -30,7 +32,7 @@ public class projectile_script : MonoBehaviour
             case "Enemy":
                 if (collidedWithShield == true)
                 {
-                    collision.gameObject.GetComponent<enemy_script>().health -= 1;
+                    collision.gameObject.GetComponent<enemy_script>().DecreaseHealth();
                     SetProjectile();
                 }
                 break;
@@ -39,6 +41,7 @@ public class projectile_script : MonoBehaviour
                 SetProjectile();
                 break;
             case "Shield":
+                col.excludeLayers = 0;
                 collidedWithShield = true;
                 break;
         }
@@ -53,6 +56,7 @@ public class projectile_script : MonoBehaviour
     }
     void SetProjectile()
     {
+        col.excludeLayers = LayerMask.GetMask("Enemy");
         collidedWithShield = false;
         gameObject.SetActive(false);
         parentObj.GetComponent<enemy_script>().projectilesFired[gameObject] = false;

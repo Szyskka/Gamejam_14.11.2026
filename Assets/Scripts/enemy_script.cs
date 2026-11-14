@@ -62,4 +62,13 @@ public class enemy_script : MonoBehaviour
             }
         }
     }
+
+    public void DecreaseHealth()
+    {
+        health -= 1;
+        if (health == 0)
+        {
+            Destroy(gameObject);
+        }
+    }
 }
