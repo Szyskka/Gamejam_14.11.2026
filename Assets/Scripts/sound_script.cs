@@ -4,6 +4,7 @@ public class sound_script : MonoBehaviour
 {
     public AudioClip shootProjctile;
     public AudioClip dieSound;
+    public AudioClip enemyDeath;
     public AudioSource audioSource;
     
     public static sound_script Instance;
@@ -28,5 +29,9 @@ public class sound_script : MonoBehaviour
     public void PlayDieSound()
     {
         audioSource.PlayOneShot(dieSound);
+    }
+    public void PlayOnEnemyDeath()
+    {
+        audioSource.PlayOneShot(enemyDeath);
     }
 }

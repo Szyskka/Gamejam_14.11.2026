@@ -12,6 +12,9 @@ public class set_map_script : MonoBehaviour
     public float yBOTTOM = -72.5f;
     public float xRIGHT = 72.5f;
     public float xLEFT = 72.5f;
+    [Header("Grass")]
+    public int grassNum;
+    public Sprite[] grassSprites;
     private GameObject player;
     private GameObject wave;
     private List<GameObject> enemies = new List<GameObject>();
@@ -23,6 +26,7 @@ public class set_map_script : MonoBehaviour
         UI = GameObject.Find("UIManager");
         wave = GameObject.Find("WaveManager");
         SetMap();
+        SetGrass();
     }
     public void SetMap()
     {
@@ -99,6 +103,19 @@ public class set_map_script : MonoBehaviour
         if (enemies.Count>0 && !already)
         {
             already = true;
+        }
+    }
+    private void SetGrass()
+    {
+        for (int i = 0; i<grassNum; i++)
+        {
+            GameObject imgObject = new GameObject("Grass_"+i);
+            imgObject.transform.SetParent(GameObject.Find("Grass").transform);
+            imgObject.AddComponent<SpriteRenderer>();
+            imgObject.GetComponent<SpriteRenderer>().sprite = grassSprites[Random.Range(0, grassSprites.Count()-1)];
+            float posX = Random.Range(xLEFT, xRIGHT);
+            float posY = Random.Range(yBOTTOM, yTOP);
+            imgObject.transform.position = new Vector3 (posX, posY, 1);
         }
     }
 }

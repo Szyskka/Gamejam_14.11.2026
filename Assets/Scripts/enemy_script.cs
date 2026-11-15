@@ -90,12 +90,17 @@ public class enemy_script : MonoBehaviour
         health -= 1;
         if (health == 0)
         {
-            Destroy(gameObject);
             if (ass.isPlaying)
             {
                 ass.Stop();
             }
+            animator.SetBool("dead", true);
         }
+    }
+    public void DestroySelf()
+    {
+        sound_script.Instance.PlayOnEnemyDeath();
+        Destroy(gameObject);
     }
     public void PlayerIsDead()
     {
