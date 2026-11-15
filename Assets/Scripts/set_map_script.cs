@@ -12,20 +12,28 @@ public class set_map_script : MonoBehaviour
     public float xRIGHT = 72.5f;
     public float xLEFT = 72.5f;
     private GameObject player;
+    private GameObject wave;
     private List<GameObject> enemies = new List<GameObject>();
 
     void Awake()
     {
-        SetMap();
+        wave = GameObject.Find("WaveManager");
     }
     public void SetMap()
     {
+        foreach(GameObject p in GameObject.FindGameObjectsWithTag("Projectile"))
+        {
+            Destroy(p);
+        }
+        wave_manager_script wave_Manager = wave.GetComponent<wave_manager_script>();
         SetPlayer();
-        SetEnemies(3);
+        int i = 4+(wave_Manager.wave*2);
+        SetEnemies(1);
     }
 
     void SetPlayer()
     {
+        Debug.Log("a");
         player = GameObject.Find("Player");
         if (player == null)
         {
@@ -49,7 +57,9 @@ public class set_map_script : MonoBehaviour
         {
             float posX = Random.Range(xLEFT, xRIGHT);
             float posY = Random.Range(yBOTTOM, yTOP);
-            while ((posX < player.GetComponent<Rigidbody2D>().position.x+5 && posX > player.GetComponent<Rigidbody2D>().position.x-5) || (posY < player.GetComponent<Rigidbody2D>().position.y+5 && posY > player.GetComponent<Rigidbody2D>().position.y-5))
+            Debug.Log(posX);
+            Debug.Log(posY);
+            while ((posX < player.GetComponent<Rigidbody2D>().position.x+10 && posX > player.GetComponent<Rigidbody2D>().position.x-10) || (posY < player.GetComponent<Rigidbody2D>().position.y+10 && posY > player.GetComponent<Rigidbody2D>().position.y-10))
             {
                 posX = Random.Range(xLEFT, xRIGHT);
                 posY = Random.Range(yBOTTOM, yTOP);

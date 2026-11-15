@@ -9,11 +9,13 @@ public class projectile_script : MonoBehaviour
     public GameObject parentObj;
     private Collider2D col;
     private bool collidedWithShield = false;
+    private GameObject healthDisplay;
     void Awake()
     {
         col = GetComponent<CircleCollider2D>();
         playerRB = GameObject.Find("Player").GetComponent<Rigidbody2D>();
         rb = GetComponent<Rigidbody2D>();
+        healthDisplay = GameObject.Find("HeartDisplay");
     }
     public void Initialize(GameObject creator)
     {
@@ -45,6 +47,7 @@ public class projectile_script : MonoBehaviour
                 break;
             case "Player":
                 collision.gameObject.GetComponent<player_script>().health -= 1;
+                healthDisplay.GetComponent<heart_display_script>().UpdateHearts();
                 SetProjectile();
                 break;
             case "Shield":

@@ -4,15 +4,19 @@ using UnityEngine.UI;
 
 public class heart_display_script : MonoBehaviour
 {
-    public int maxHealth;
+    private int maxHealth;
     public int currentHealth;
     public Sprite fullHeart;
     public Sprite emptyHeart;
     public float distance;
     private List<GameObject> hearts = new List<GameObject>();
+    private GameObject player;
 
     void Start()
     {
+        player = GameObject.Find("Player");
+        maxHealth = player.GetComponent<player_script>().health;
+        currentHealth = maxHealth+1;
         for (int i = 0; i<maxHealth; i++)
         {
             GameObject imgObject = new GameObject("Heart_"+i);
@@ -26,6 +30,7 @@ public class heart_display_script : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void UpdateHearts()
     {
+        currentHealth -=1;
         for (int i = 0; i<currentHealth; i++)
         {
             hearts[i].GetComponent<RectTransform>().localScale = new Vector3(0.25f, 0.25f, 0.25f);

@@ -22,12 +22,14 @@ public class enemy_script : MonoBehaviour
     private float nextFireTime;
     private GameObject player;
     private Rigidbody2D rb;
+    private GameObject wave;
 
 
     void Start()
     {
         player = GameObject.Find("Player");
         rb = GetComponent<Rigidbody2D>();
+        wave = GameObject.Find("WaveManager");
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -85,6 +87,7 @@ public class enemy_script : MonoBehaviour
         if (health == 0)
         {
             Destroy(gameObject);
+            wave.GetComponent<wave_manager_script>().enemies.Remove(gameObject);
         }
     }
 
