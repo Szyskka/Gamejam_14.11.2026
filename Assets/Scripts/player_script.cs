@@ -9,6 +9,8 @@ public class player_script : MonoBehaviour
     public int health;
     [Header("Animation")]
     public Animator animator;
+    [Header("Sound")]
+    public AudioSource ass;
     private Vector2 directions;
     private Rigidbody2D rb;
     InputAction moveAction;
@@ -43,10 +45,18 @@ public class player_script : MonoBehaviour
         if (rb.linearVelocity.x!=0 || rb.linearVelocityY!=0)
         {
             animator.SetBool("driving", true);
+            if (!ass.isPlaying)
+            {
+                ass.Play();
+            }
         }
         else
         {
             animator.SetBool("driving", false);
+            if (ass.isPlaying)
+            {
+                ass.Stop();
+            }
         }
     }
 }

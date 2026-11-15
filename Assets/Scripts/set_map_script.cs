@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class set_map_script : MonoBehaviour
@@ -14,10 +15,14 @@ public class set_map_script : MonoBehaviour
     private GameObject player;
     private GameObject wave;
     private List<GameObject> enemies = new List<GameObject>();
+    private bool already = false;
+    private GameObject UI;
 
     void Awake()
     {
+        UI = GameObject.Find("UIManager");
         wave = GameObject.Find("WaveManager");
+        SetMap();
     }
     public void SetMap()
     {
@@ -27,13 +32,13 @@ public class set_map_script : MonoBehaviour
         }
         wave_manager_script wave_Manager = wave.GetComponent<wave_manager_script>();
         SetPlayer();
-        int i = 4+(wave_Manager.wave*2);
-        SetEnemies(1);
+        int i = 1+(wave_Manager.wave*2);
+        SetEnemies(i);
+        UI.GetComponent<UI_manager_script>().ShowWave();
     }
 
     void SetPlayer()
     {
-        Debug.Log("a");
         player = GameObject.Find("Player");
         if (player == null)
         {
@@ -57,14 +62,43 @@ public class set_map_script : MonoBehaviour
         {
             float posX = Random.Range(xLEFT, xRIGHT);
             float posY = Random.Range(yBOTTOM, yTOP);
-            Debug.Log(posX);
-            Debug.Log(posY);
             while ((posX < player.GetComponent<Rigidbody2D>().position.x+10 && posX > player.GetComponent<Rigidbody2D>().position.x-10) || (posY < player.GetComponent<Rigidbody2D>().position.y+10 && posY > player.GetComponent<Rigidbody2D>().position.y-10))
             {
                 posX = Random.Range(xLEFT, xRIGHT);
                 posY = Random.Range(yBOTTOM, yTOP);
             }
             e.transform.position = new Vector2 (posX, posY);
+        }
+    }
+    public void TurnOffSound()
+    {
+        foreach (GameObject g in enemies)
+        {
+            g.GetComponent<enemy_script>().PlayerIsDead();
+        }
+    }
+    void Update()
+    {
+        if (enemies.Count != GameObject.FindGameObjectsWithTag("Enemy").Count())
+        {
+            enemies.Clear();
+            if (GameObject.FindGameObjectsWithTag("Enemy").Count() != 0)
+            {
+                foreach (GameObject i in GameObject.FindGameObjectsWithTag("Enemy"))
+                {
+                    enemies.Add(i);
+                }
+            }
+        }
+        if (enemies.Count == 0 && already)
+        {
+            wave.GetComponent<wave_manager_script>().wave +=1;
+            SetMap();
+            already = false;
+        }
+        if (enemies.Count>0 && !already)
+        {
+            already = true;
         }
     }
 }

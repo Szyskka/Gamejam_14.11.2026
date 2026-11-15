@@ -17,6 +17,8 @@ public class enemy_script : MonoBehaviour
     public float stopDistance;
     [Header("Animation")]
     public Animator animator;
+    [Header("Sound")]
+    public AudioSource ass;
     private List<GameObject> projectiles = new List<GameObject>();
     public Dictionary<GameObject, bool> projectilesFired = new Dictionary<GameObject, bool>();
     private float nextFireTime;
@@ -65,6 +67,7 @@ public class enemy_script : MonoBehaviour
             projectiles.Add(p);
             projectilesFired.Add(p, true);
             p.GetComponent<projectile_script>().parentObj = gameObject;
+            sound_script.Instance.PlayShootSound();
             p.GetComponent<projectile_script>().Shoot(projectileForce, projectileLife);
         }
         else
@@ -74,6 +77,7 @@ public class enemy_script : MonoBehaviour
                 if (projectilesFired[p] == false)
                 {
                     projectilesFired[p] = true;
+                    sound_script.Instance.PlayShootSound();
                     p.GetComponent<projectile_script>().Shoot(projectileForce, projectileLife);
                     break;
                 }
@@ -87,7 +91,17 @@ public class enemy_script : MonoBehaviour
         if (health == 0)
         {
             Destroy(gameObject);
-            wave.GetComponent<wave_manager_script>().enemies.Remove(gameObject);
+            if (ass.isPlaying)
+            {
+                ass.Stop();
+            }
+        }
+    }
+    public void PlayerIsDead()
+    {
+        if (ass.isPlaying)
+        {
+            ass.Stop();
         }
     }
 
@@ -106,10 +120,18 @@ public class enemy_script : MonoBehaviour
         if (rb.linearVelocity.x!=0 || rb.linearVelocityY!=0)
         {
             animator.SetBool("driving", true);
+            if (!ass.isPlaying)
+            {
+                ass.Play();
+            }
         }
         else
         {
             animator.SetBool("driving", false);
+            if (ass.isPlaying)
+            {
+                ass.Stop();
+            }
         }
     }
     void Update()
