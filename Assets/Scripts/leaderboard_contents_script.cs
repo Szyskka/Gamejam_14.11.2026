@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class LeaderboardManager : MonoBehaviour
 {
+    public static LeaderboardManager Instance { get; private set; }
+
     [System.Serializable]
     public struct LeaderboardEntry
     {
@@ -24,65 +27,113 @@ public class LeaderboardManager : MonoBehaviour
     [SerializeField] private float rowHeight = 40f;
     [SerializeField] private int maxEntries = 10;
 
-    [Header("Optional: Leave empty to auto-create UI")]
+    [Header("Container Reference")]
+    [Tooltip("Drag your UI Panel here")]
     [SerializeField] private Transform leaderboardContainer;
 
+    private string cachedContainerName;
     private List<LeaderboardEntry> entries = new List<LeaderboardEntry>();
 
     private void Awake()
     {
-        if (leaderboardContainer == null)
+        if (Instance != null && Instance != this)
         {
-            CreateLeaderboardContainer();
+            // If the new scene has its own LeaderboardManager with a dragged container, pass that reference over
+            if (leaderboardContainer != null)
+            {
+                Instance.SetContainer(leaderboardContainer);
+            }
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+
+        if (leaderboardContainer != null)
+        {
+            cachedContainerName = leaderboardContainer.name;
+            ConfigureContainerLayout(leaderboardContainer.gameObject);
         }
         else
         {
-            ConfigureContainerLayout(leaderboardContainer.gameObject);
+            Debug.LogWarning("LeaderboardManager: Please drag a UI panel into the Leaderboard Container slot!");
         }
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        // Example test data
-        List<LeaderboardEntry> sampleData = new List<LeaderboardEntry>
-        {
-            new LeaderboardEntry("Alex", 12),
-            new LeaderboardEntry("Sam", 25),
-            new LeaderboardEntry("Jordan", 8)
-        };
-
-        UpdateLeaderboard(sampleData);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    /// <summary>
-    /// Clears existing UI rows, sorts entries by highest wave, and rebuilds the text UI.
-    /// </summary>
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // If the previous scene's UI was destroyed, find the matching panel in the newly loaded scene
+        if (leaderboardContainer == null && !string.IsNullOrEmpty(cachedContainerName))
+        {
+            RectTransform[] allRects = FindObjectsByType<RectTransform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (RectTransform rect in allRects)
+            {
+                if (rect.name == cachedContainerName)
+                {
+                    SetContainer(rect.transform);
+                    break;
+                }
+            }
+        }
+
+        UpdateLeaderboard(entries);
+    }
+
+    public void SetContainer(Transform newContainer)
+    {
+        leaderboardContainer = newContainer;
+        if (leaderboardContainer != null)
+        {
+            cachedContainerName = leaderboardContainer.name;
+            ConfigureContainerLayout(leaderboardContainer.gameObject);
+            UpdateLeaderboard(entries);
+        }
+    }
+
+    public void OpenLeaderboard()
+    {
+        if (leaderboardContainer != null)
+        {
+            leaderboardContainer.gameObject.SetActive(true);
+            UpdateLeaderboard(entries);
+        }
+    }
+
     public void UpdateLeaderboard(List<LeaderboardEntry> updatedEntries)
     {
-        // 1. Sort descending so the highest wave is at the top and cap at maxEntries
         entries = updatedEntries
             .OrderByDescending(e => e.waveDied)
             .Take(maxEntries)
             .ToList();
 
-        // 2. Clear previous UI rows
+        if (leaderboardContainer == null) return;
+
         foreach (Transform child in leaderboardContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // 3. Create new TextMeshPro UI rows
         for (int i = 0; i < entries.Count; i++)
         {
             CreateEntryText(i + 1, entries[i]);
         }
     }
 
-    /// <summary>
-    /// Helper to add a single player score and immediately refresh the UI.
-    /// </summary>
     public void AddScoreAndRefresh(string playerName, int waveDied)
     {
+        Debug.Log("b");
         entries.Add(new LeaderboardEntry(playerName, waveDied));
         UpdateLeaderboard(entries);
     }
@@ -101,7 +152,6 @@ public class LeaderboardManager : MonoBehaviour
         tmp.textWrappingMode = TextWrappingModes.NoWrap;
         tmp.overflowMode = TextOverflowModes.Ellipsis;
 
-        // Tells the VerticalLayoutGroup how tall each row should be while width stretches to fit parent
         LayoutElement layoutElement = rowObj.AddComponent<LayoutElement>();
         layoutElement.preferredHeight = rowHeight;
     }
@@ -122,33 +172,9 @@ public class LeaderboardManager : MonoBehaviour
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
 
-        // Clips any rows that exceed the panel's bounds
         if (containerObj.GetComponent<RectMask2D>() == null)
         {
             containerObj.AddComponent<RectMask2D>();
         }
-    }
-
-    private void CreateLeaderboardContainer()
-    {
-        Canvas canvas = FindFirstObjectByType<Canvas>();
-        if (canvas == null)
-        {
-            GameObject canvasObj = new GameObject("Canvas");
-            canvas = canvasObj.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObj.AddComponent<CanvasScaler>();
-            canvasObj.AddComponent<GraphicRaycaster>();
-        }
-
-        GameObject panelObj = new GameObject("LeaderboardContainer");
-        panelObj.transform.SetParent(canvas.transform, false);
-
-        RectTransform panelRect = panelObj.AddComponent<RectTransform>();
-        panelRect.sizeDelta = new Vector2(500, 600);
-        panelRect.anchoredPosition = Vector2.zero;
-
-        ConfigureContainerLayout(panelObj);
-        leaderboardContainer = panelObj.transform;
     }
 }

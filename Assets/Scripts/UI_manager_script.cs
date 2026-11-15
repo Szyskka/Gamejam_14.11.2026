@@ -157,4 +157,10 @@ public class UI_manager_script : MonoBehaviour
         backgroundGroup.alpha = targetAlpha;
         popupWindow.localScale = targetScale;
     }
+
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }

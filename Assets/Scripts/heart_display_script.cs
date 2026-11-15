@@ -12,9 +12,14 @@ public class heart_display_script : MonoBehaviour
     private List<GameObject> hearts = new List<GameObject>();
     private GameObject player;
     private bool dieSoundPlayed = false;
+    private GameObject leaderboard;
+    private GameObject wave;
+    public string playerName;
 
     void Start()
     {
+        leaderboard = GameObject.Find("UpdateLeadetboard");
+        wave = GameObject.Find("WaveManager");
         player = GameObject.Find("Player");
         maxHealth = player.GetComponent<player_script>().health;
         currentHealth = maxHealth+1;
@@ -58,5 +63,11 @@ public class heart_display_script : MonoBehaviour
             GameObject.Find("SetMap").GetComponent<set_map_script>().TurnOffSound();
             GameObject.Find("UIManager").GetComponent<UI_manager_script>().Death();
         }
+    }
+    public void SetPlayerName(string name)
+    {
+        playerName = name;
+        Debug.Log(name);
+        leaderboard.GetComponent<LeaderboardManager>().AddScoreAndRefresh(playerName, wave.GetComponent<wave_manager_script>().wave);
     }
 }
